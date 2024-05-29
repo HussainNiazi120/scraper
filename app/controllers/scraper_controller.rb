@@ -48,7 +48,7 @@ class ScraperController < ApplicationController
 
   def render_error
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.replace('formErrors', partial: 'form_errors') }
+      format.turbo_stream { render 'scrape' }
       format.json { render json: @error, status: @error[:code] }
     end
   end

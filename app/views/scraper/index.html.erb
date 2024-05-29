@@ -1,34 +1,34 @@
-<h1>Scraper</h1>
+<div class="p-4 bg-gray-100">
+    <h1 class="text-5xl font-bold mb-4 text-center">Scraper</h1>
 
-<%= form_with url: scrape_path, data: { controller: 'form', form_target: 'form' }, method: :post do |form| %>
-        <%= render 'form_messages' %>
-        <%= render 'form_errors' %>
-        <%= text_field_tag :url, nil, placeholder: 'Enter URL', autocomplete: false, data: { form_target: "url", action: "input->form#validateForm" } %>
-        <div>
-            <hr>
-            <h3>Meta tags</h3>
-            <div>
-                <div data-form-target="metaTagGroup"}>
-                    <%= text_field_tag "fields[meta][]", nil, placeholder: 'Enter meta tag', autocomplete: false, data: { form_target: "metaTag", action: "input->form#addRemoveMetaTag" } %>
+    <%= form_with url: scrape_path, data: { controller: 'form', form_target: 'form' }, method: :post, class: 'space-y-4' do |form| %>
+            <%= render 'form_messages' %>
+            <%= render 'form_errors' %>
+            <%= text_field_tag :url, nil, placeholder: 'Enter URL', autocomplete: false, data: { form_target: "url", action: "input->form#validateForm" }, class: 'w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300' %>
+            <div class="border-t pt-4">
+                <h3 class="text-lg font-semibold">Meta tags</h3>
+                <div class="mt-2">
+                    <div data-form-target="metaTagGroup"}>
+                        <%= text_field_tag "fields[meta][]", nil, placeholder: 'Enter meta tag', autocomplete: false, data: { form_target: "metaTag", action: "input->form#addRemoveMetaTag" }, class: "w-1/4 p-2 m-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300" %>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div>
-            <hr>
-            <h3>Fields</h3>
-            <div data-form-target="fieldsList" >
-                <div data-form-target="field"}>
-                    <%= text_field_tag "fields[key]", nil, placeholder: 'Enter key', autocomplete: false, data: { form_target: "fieldKey", action: "input->form#addRemoveField" } %>
-                    <%= text_field_tag "fields[selector]", nil, placeholder: 'Enter selector', autocomplete: false, data: { form_target: "fieldSelector", action: "input->form#addRemoveField" } %>
-                    <%= button_tag 'Remove', type: 'button', data: { form_target: "removeFieldButton", action: "click->form#removeField" }, disabled: true %>
-                    <br>
+            <div class="border-t pt-4">
+                <h3 class="text-lg font-semibold">Fields</h3>
+                <div data-form-target="fieldsList" class="mt-2" >
+                    <div data-form-target="field"}>
+                        <%= text_field_tag "fields[key]", nil, placeholder: 'Enter key', autocomplete: false, data: { form_target: "fieldKey", action: "input->form#addRemoveField" }, class: "w-1/4 p-2 m-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300" %>
+                        <%= text_field_tag "fields[selector]", nil, placeholder: 'Enter selector', autocomplete: false, data: { form_target: "fieldSelector", action: "input->form#addRemoveField" }, class: "w-1/4 p-2 m-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300" %>
+                        <%= button_tag 'Remove', type: 'button', data: { form_target: "removeFieldButton", action: "click->form#removeField" }, disabled: true, class: "w-1/4 p-2 m-2 text-red-500 cursor-not-allowed opacity-50 border-solid border-2 hover:underline mt-2" %>
+                        <br>
+                    </div>
                 </div>
             </div>
-        </div>
-        <hr>
-        <%= submit_tag 'Scrape', data: { form_target: 'submitButton', action: "click->form#SerializePayload" }, disabled: true %>
-<% end %>
+            <hr class="my-4">
+            <%= submit_tag 'Scrape', data: { form_target: 'submitButton', action: "click->form#SerializePayload" }, disabled: true, class: "bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300" %>
+    <% end %>
 
-<div id="responseContainer">
-    <%= render "response" %>
+    <div id="responseContainer" class="mt-4">
+        <%= render "response" %>
+    </div>
 </div>

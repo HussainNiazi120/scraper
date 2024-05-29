@@ -20,9 +20,10 @@ class ScrapeService < ApplicationService
 
   def initialize(params)
     super()
+    @params = params
     @url = params[:url]
-    @fields = params[:fields]
-    @meta_tags = @fields.delete(:meta) if @fields.present? && @fields[:meta].present?
+    @fields = sanitize_fields
+    @meta_tags = meta_tags
     @messages = []
   end
 
@@ -40,6 +41,16 @@ class ScrapeService < ApplicationService
   end
 
   private
+
+  def sanitize_fields
+    @params[:fields]&.delete_if { |_, v| v.nil? || v.empty? }
+  end
+
+  def meta_tags
+    tags = @fields.delete(:meta) if @fields.present? && @fields[:meta].present?
+
+    tags&.delete_if(&:blank?)
+  end
 
   def validate_fields
     @fields = @fields&.select { |k, v| k.present? && v.present? }

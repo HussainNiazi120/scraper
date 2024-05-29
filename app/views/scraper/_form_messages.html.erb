@@ -1,4 +1,4 @@
-<div id="formMessages">
+<div id="formMessages" <% if @messages.present? %>class="border-solid border-2 border-green-600 p-4 text-green-600"<% end %>>
     <% Array(@messages).each do |message| %>
         <li><%= message %></li>
     <% end %>

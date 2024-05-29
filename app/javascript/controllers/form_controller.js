@@ -4,7 +4,7 @@ export default class extends Controller {
   static targets = ["form", "url", "submitButton", "addMetaTag", "metaTagGroup", "metaTag", "fieldsList", "field", "fieldKey", "removeFieldButton", "fieldSelector"]
 
   connect() {
-    this.submitButtonTarget.disabled = true
+    this.disableSubmitButton()
   }
 
   fieldTargetConnected(element) {
@@ -15,21 +15,25 @@ export default class extends Controller {
     this.validateForm()
   }
 
+  // Add or remove meta tags based on their presence
   addRemoveMetaTag() {
     this._all_meta_tags_present() ? this._addNewMetaTag() : this._removeEmptyMetaTags()
   }
 
+  // Add a new meta tag
   _addNewMetaTag() {
     let newMetaTag = this.metaTagTarget.cloneNode(true)
     newMetaTag.value = ''
     this.metaTagGroupTarget.appendChild(newMetaTag)
   }
 
+  // Add or remove fields based on their validity
   addRemoveField() {
     this._fieldsValid() ? this._addNewField() : this._removeEmptyFields()
     this._resetRemoveFieldButtons()
   }
 
+  // Add a new field
   _addNewField() {
     let newField = this.fieldTarget.cloneNode(true)
     newField.querySelector('input[name="fields[key]"]').value = ''
@@ -37,11 +41,13 @@ export default class extends Controller {
     this.fieldsListTarget.appendChild(newField)
   }
 
+  // Remove a field
   removeField(e) {
     e.target.closest('[data-form-target="field"]').remove()
     this._resetRemoveFieldButtons()
   }
 
+  // Serialize the payload and send it
   SerializePayload(e) {
     e.preventDefault()
     this._removeEmptyMetaTags()
@@ -52,6 +58,7 @@ export default class extends Controller {
     this._sendPayload(payload)
   }
 
+  // Serialize the fields
   _serializeFields() {
     let fields = {}
     this.fieldKeyTargets.forEach((fieldKey, index) => {
@@ -61,10 +68,12 @@ export default class extends Controller {
     return fields
   }
 
+  // Serialize the meta tags
   _serializeMetaTags() {
     return this.metaTagTargets.map(metaTag => metaTag.value)
   }
 
+  // Create the payload
   _createPayload(fields) {
     return {
       authenticity_token: this.formTarget.querySelector('input[name="authenticity_token"]').value,
@@ -73,6 +82,7 @@ export default class extends Controller {
     }
   }
 
+  // Send the payload
   _sendPayload(payload) {
     fetch('scraper/scrape', {
       method: 'POST',
@@ -94,18 +104,23 @@ export default class extends Controller {
     })
   }
 
+  // Validate the form
   validateForm() {
     this.submitButtonTarget.disabled = !(this._urlValid() && this._fieldsValid())
+    this.submitButtonTarget.disabled ? this.disableSubmitButton() : this.enableSubmitButton()
   }
 
+  // Check if the URL is valid
   _urlValid() {
     return this.urlTarget.value !== ""
   }
 
+  // Check if all meta tags are present
   _all_meta_tags_present() {
     return this.metaTagTargets.every(metaTag => metaTag.value !== "")
   }
 
+  // Remove empty meta tags
   _removeEmptyMetaTags() {
     this.metaTagTargets.filter(metaTag => metaTag.value === "").forEach((metaTag, index, emptyMetaTags) => {
       if (emptyMetaTags.length > 1 && index === 0) {
@@ -114,6 +129,7 @@ export default class extends Controller {
     })
   }
 
+  // Remove empty fields
   _removeEmptyFields() {
     this.fieldTargets.filter(field => field.querySelector('input[name="fields[key]"]').value === "" && field.querySelector('input[name="fields[selector]"]').value === "").forEach((field, index, emptyFields) => {
       if (emptyFields.length > 1 && index === 0) {
@@ -122,17 +138,21 @@ export default class extends Controller {
     })
   }
 
+  // Reset the remove field buttons
   _resetRemoveFieldButtons() {
     this.removeFieldButtonTargets.forEach(removeFieldButton => removeFieldButton.disabled = false)
+    this.removeFieldButtonTargets.forEach(removeFieldButton => removeFieldButton.classList.remove('cursor-not-allowed', 'opacity-50'))
+    
     if(this.fieldTargets.length === 1) {
-      this.removeFieldButtonTargets[0].disabled = true
+      this.disableRemoveFieldButton(this.removeFieldButtonTargets[0])
     }
     if(this.fieldTargets.length > 1) {
-      this.removeFieldButtonTargets[this.fieldTargets.length - 1].disabled = true
+      this.disableRemoveFieldButton(this.removeFieldButtonTargets[this.fieldTargets.length - 1])
     }
     this._removeEmptyFields()
   }
 
+  // Check if the fields are valid
   _fieldsValid() {
     return this.fieldTargets.every((field, index) => {
       if (index !== this.fieldTargets.length - 1) {
@@ -140,5 +160,23 @@ export default class extends Controller {
       }
       return true
     })
+  }
+
+  // Disable the submit button
+  disableSubmitButton() {
+    this.submitButtonTarget.disabled = true
+    this.submitButtonTarget.classList.add('cursor-not-allowed', 'opacity-50')
+  }
+
+  // Enable the submit button
+  enableSubmitButton() {
+    this.submitButtonTarget.disabled = false
+    this.submitButtonTarget.classList.remove('cursor-not-allowed', 'opacity-50')
+  }
+
+  // Disable the remove field button
+  disableRemoveFieldButton(button) {
+    button.disabled = true
+    button.classList.add('cursor-not-allowed', 'opacity-50')
   }
 }

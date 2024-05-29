@@ -1,4 +1,4 @@
-<div id="formErrors">
+<div id="formErrors" <% if @error.present? %>class="border-solid border-2 border-yellow-600 p-4 text-orange-600"<% end %>>
     <% if @error.present? %>
         <b><%= @error[:code] %></b> : <%= @error[:message] %>
     <% end %>

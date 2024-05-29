@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "esbuild": "^0.21.4",
+    "esbuild-plugin-postcss2": "^0.1.2"
+  },
+  "scripts": {
+    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify",
+    "watch:css": "node css.config.js --watch"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3"
+  }
+}
