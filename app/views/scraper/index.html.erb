@@ -1,6 +1,7 @@
-<h1>Scrapper</h1>
+<h1>Scraper</h1>
 
-<%= form_with url: scrap_path, data: { controller: 'form', form_target: 'form' }, method: :post do |form| %>
+<%= form_with url: scrape_path, data: { controller: 'form', form_target: 'form' }, method: :post do |form| %>
+        <%= render 'form_messages' %>
         <%= render 'form_errors' %>
         <%= text_field_tag :url, nil, placeholder: 'Enter URL', autocomplete: false, data: { form_target: "url", action: "input->form#validateForm" } %>
         <div>
@@ -25,7 +26,7 @@
             </div>
         </div>
         <hr>
-        <%= submit_tag 'Scrap', data: { form_target: 'submitButton', action: "click->form#SerializePayload" }, disabled: true %>
+        <%= submit_tag 'Scrape', data: { form_target: 'submitButton', action: "click->form#SerializePayload" }, disabled: true %>
 <% end %>
 
 <div id="responseContainer">

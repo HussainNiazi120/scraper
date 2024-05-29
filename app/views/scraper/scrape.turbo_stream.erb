@@ -1,0 +1,12 @@
+<%= turbo_stream.replace "response" do %>
+    <%= render partial: "response" %>
+<% end %>
+
+<%= turbo_stream.replace "formErrors" do %>
+    <%= render partial: "form_errors" %>
+<% end %>
+
+<%= turbo_stream.replace "formMessages" do %>
+    <%= render partial: "form_messages" %>
+<% end %>
+

@@ -1,0 +1,12 @@
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  Include:
+    - 'app/**/*.rb'
+    - 'test/**/*.rb'
+  Exclude:
+    - 'bin/**/*'
+
+Metrics/ClassLength:
+  Exclude:
+    - 'test/**/*'
