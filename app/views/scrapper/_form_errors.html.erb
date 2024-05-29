@@ -1,0 +1,5 @@
+<div id="formErrors">
+    <% if @error.present? %>
+        <b><%= @error[:code] %></b> : <%= @error[:message] %>
+    <% end %>
+</div>

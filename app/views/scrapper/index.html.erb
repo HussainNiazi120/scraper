@@ -1,0 +1,33 @@
+<h1>Scrapper</h1>
+
+<%= form_with url: scrap_path, data: { controller: 'form', form_target: 'form' }, method: :post do |form| %>
+        <%= render 'form_errors' %>
+        <%= text_field_tag :url, nil, placeholder: 'Enter URL', autocomplete: false, data: { form_target: "url", action: "input->form#validateForm" } %>
+        <div>
+            <hr>
+            <h3>Meta tags</h3>
+            <div>
+                <div data-form-target="metaTagGroup"}>
+                    <%= text_field_tag "fields[meta][]", nil, placeholder: 'Enter meta tag', autocomplete: false, data: { form_target: "metaTag", action: "input->form#addRemoveMetaTag" } %>
+                </div>
+            </div>
+        </div>
+        <div>
+            <hr>
+            <h3>Fields</h3>
+            <div data-form-target="fieldsList" >
+                <div data-form-target="field"}>
+                    <%= text_field_tag "fields[key]", nil, placeholder: 'Enter key', autocomplete: false, data: { form_target: "fieldKey", action: "input->form#addRemoveField" } %>
+                    <%= text_field_tag "fields[selector]", nil, placeholder: 'Enter selector', autocomplete: false, data: { form_target: "fieldSelector", action: "input->form#addRemoveField" } %>
+                    <%= button_tag 'Remove', type: 'button', data: { form_target: "removeFieldButton", action: "click->form#removeField" }, disabled: true %>
+                    <br>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <%= submit_tag 'Scrap', data: { form_target: 'submitButton', action: "click->form#SerializePayload" }, disabled: true %>
+<% end %>
+
+<div id="responseContainer">
+    <%= render "response" %>
+</div>
