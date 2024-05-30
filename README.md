@@ -1,25 +1,45 @@
-# README
+# Web Scraper
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This application is built with **Ruby v3.3.1** and **Rails 7.1.3.3**. It scrapes data from webpages based on meta tag names and CSS selectors.
 
-Things you may want to cover:
+## Features
 
-* Ruby version
+- Uses [Nokogiri](https://nokogiri.org/) to parse and scrape HTML.
+- Caches HTML into Redis cache store for faster subsequent requests.
+- Uses [Hotwire](https://hotwire.dev/) turbostreams and [Stimulus.js](https://stimulus.hotwire.dev/) for UI.
+- Supports JSON requests to endpoint `POST /scraper/scrape`.
 
-* System dependencies
+## Usage
 
-* Configuration
+Send a POST request to `/scraper/scrape` with the following JSON parameters:
 
-* Database creation
+```json
+{
+    "url": "https://www.alza.cz/aeg-7000-prosteam-lfr73964cc-d7635493.htm",
+    "fields": {
+        "meta": ["keywords", "twitter:image"],
+        "price": ".price-box__price",
+        "rating_count": ".ratingCount",
+        "rating_value": ".ratingValue"
+    }
+}
+```
 
-* Database initialization
+The response will look like this:
 
-* How to run the test suite
+```json
+{
+    "price": "18290,-",
+    "rating_value": "4,9",
+    "rating_count": "7 hodnocení",
+    "meta": {
+        "keywords": "Parní pračka AEG 7000 ProSteam® LFR73964CC na www.alza.cz. ✅ Bezpečný nákup. ✅ Veškeré informace o produktu. ✅ Vhodné příslušenství. ✅ Hodnocení a recenze AEG...",
+        "twitter:image": "https://image.alza.cz/products/AEGPR065/AEGPR065.jpg?width=360&height=360"
+    }
+}
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+## Live Demo
 
-* Deployment instructions
+A working example can be seen at [https://164.92.236.239/](https://164.92.236.239/) (will render warnings for self-signed SSL certificate).
 
-* ...
-# scraper
