@@ -86,14 +86,25 @@ class ScrapeService < ApplicationService
   end
 
   def fetch_and_cache_html(url)
-    request = Net::HTTP::Get.new(url)
-
-    response = Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == 'https') do |http|
-      http.request(request)
-    end
+    response = make_request(url)
 
     raise WebPageError, "Failed to fetch the page: #{response.message}" if response.code != '200'
 
+    cache_response(url, response)
+  end
+
+  def make_request(url)
+    request = Net::HTTP::Get.new(url)
+    request['User-Agent'] =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)' \
+      'Chrome/58.0.3029.110 Safari/537.3'
+
+    Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == 'https') do |http|
+      http.request(request)
+    end
+  end
+
+  def cache_response(url, response)
     html = response.body
     Rails.cache.write(url.to_s, html, expires_in: 1.hour)
     @messages << 'Fetched from URL'
