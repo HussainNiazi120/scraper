@@ -41,5 +41,5 @@ The response will look like this:
 
 ## Live Demo
 
-A working example can be seen at [https://164.92.236.239/](https://164.92.236.239/) (will render warnings for self-signed SSL certificate).
+A working example can be seen at https://scraper.niazi.pl/.
 
