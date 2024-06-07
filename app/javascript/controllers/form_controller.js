@@ -84,7 +84,7 @@ export default class extends Controller {
 
   // Send the payload
   _sendPayload(payload) {
-    fetch('scraper/scrape', {
+    fetch('api/v1/scraper/scrape', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

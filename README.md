@@ -7,11 +7,11 @@ This application is built with **Ruby v3.3.1** and **Rails 7.1.3.3**. It scrapes
 - Uses [Nokogiri](https://nokogiri.org/) to parse and scrape HTML.
 - Caches HTML into Redis cache store for faster subsequent requests.
 - Uses [Hotwire](https://hotwire.dev/) turbostreams and [Stimulus.js](https://stimulus.hotwire.dev/) for UI.
-- Supports JSON requests to endpoint `POST /scraper/scrape`.
+- Supports JSON requests to endpoint `POST api/v1/scraper/scrape`.
 
 ## Usage
 
-Send a POST request to `/scraper/scrape` with the following JSON parameters:
+Send a POST request to `api/v1/scraper/scrape` with the following JSON parameters:
 
 ```json
 {
