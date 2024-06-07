@@ -1,7 +1,7 @@
 <div class="p-4 bg-gray-100">
     <h1 class="text-5xl font-bold mb-4 text-center">Scraper</h1>
 
-    <%= form_with url: scrape_path, data: { controller: 'form', form_target: 'form' }, method: :post, class: 'space-y-4' do |form| %>
+    <%= form_with data: { controller: 'form', form_target: 'form' }, method: :post, class: 'space-y-4' do |form| %>
             <%= render 'form_messages' %>
             <%= render 'form_errors' %>
             <%= text_field_tag :url, nil, placeholder: 'Enter URL', autocomplete: false, data: { form_target: "url", action: "input->form#validateForm" }, class: 'w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300' %>
