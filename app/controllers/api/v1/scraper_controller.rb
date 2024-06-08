@@ -10,13 +10,8 @@ module Api
         @messages = response.delete(:messages)
 
         render json: response.as_json
-      rescue SanitizeUrlService::UrlMissingError, SanitizeUrlService::InvalidUrlError,
-             ValidateFieldsService::MissingOrInvalidFields => e
-        render json: { message: e.message }, status: 422
-      rescue FetchHtmlService::WebPageError => e
-        render json: { message: e.message }, status: 500
-      rescue StandardError
-        render json: { message: 'There was an unexpected error!' }, status: 500
+      rescue StandardError => e
+        handle_error(e)
       end
 
       private
@@ -24,6 +19,22 @@ module Api
       def scrape_params
         params.permit(:url, :commit, fields: {})
       end
+
+      # rubocop:disable Metrics/MethodLength
+      def handle_error(error)
+        case error
+        when SanitizeUrlService::UrlMissingError, SanitizeUrlService::InvalidUrlError,
+             ValidateFieldsService::MissingOrInvalidFields
+          render json: { message: error.message }, status: 422
+        when FetchHtmlService::ForbiddenError
+          render json: { message: error.message }, status: 403
+        when FetchHtmlService::WebPageError
+          render json: { message: error.message }, status: 500
+        else
+          render json: { message: 'There was an unexpected error!' }, status: 500
+        end
+      end
+      # rubocop:enable Metrics/MethodLength
     end
   end
 end

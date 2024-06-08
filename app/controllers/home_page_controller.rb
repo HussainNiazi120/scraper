@@ -9,13 +9,8 @@ class HomePageController < ApplicationController
     @messages = @response.delete(:messages)
 
     respond_to(&:turbo_stream)
-  rescue SanitizeUrlService::UrlMissingError, SanitizeUrlService::InvalidUrlError,
-         ValidateFieldsService::MissingOrInvalidFields => e
-    handle_error(e, 422)
-  rescue FetchHtmlService::WebPageError => e
-    handle_error(e, 500)
-  rescue StandardError
-    handle_unexpected_error
+  rescue StandardError => e
+    handle_error(e)
   end
 
   private
@@ -24,20 +19,27 @@ class HomePageController < ApplicationController
     params.permit(:url, :commit, fields: {})
   end
 
-  def handle_error(error, code)
-    @error = { code:, message: error.message }
-    render_error
+  # rubocop:disable Metrics/MethodLength
+  def handle_error(error)
+    case error
+    when SanitizeUrlService::UrlMissingError, SanitizeUrlService::InvalidUrlError,
+         ValidateFieldsService::MissingOrInvalidFields
+      @error = { code: 422, message: error.message }
+    when FetchHtmlService::ForbiddenError
+      @error = { code: 403, message: error.message }
+    when FetchHtmlService::WebPageError
+      @error = { code: 500, message: error.message }
+      render_error
+    else
+      @error = { code: 500, message: 'There was an unexpected error' }
+      render_error
+    end
   end
-
-  def handle_unexpected_error
-    @error = { code: 500, message: 'There was an unexpected error' }
-    render_error
-  end
+  # rubocop:enable Metrics/MethodLength
 
   def render_error
     respond_to do |format|
       format.turbo_stream { render 'scrape' }
-      format.json { render json: @error, status: @error[:code] }
     end
   end
 end
