@@ -4,55 +4,25 @@ module Api
   module V1
     # The ScraperController handles the web scraping functionality of the application.
     # It uses the ScrapeService to scrape data from a given URL and returns the scraped data.
-    class ScraperController < ApplicationController
-      skip_before_action :verify_authenticity_token
-
-      rescue_from ScrapeService::UrlMissingError, with: :handle_url_missing
-      rescue_from ScrapeService::InvalidUrlError, with: :handle_invalid_url_error
-      rescue_from ScrapeService::MissingOrInvalidFields, with: :handle_missing_or_invalid_fields
-      rescue_from ScrapeService::WebPageError, with: :handle_webpage_error
-
+    class ScraperController < ActionController::API
       def scrape
-        @response = ScrapeService.call(scrape_params)
-        @messages = @response.delete(:messages)
+        response = ScrapeService.call(scrape_params)
+        @messages = response.delete(:messages)
 
-        respond_to do |format|
-          format.turbo_stream { render template: 'home_page/scrape' }
-          format.json { render json: @response }
-        end
+        render json: response.as_json
+      rescue SanitizeUrlService::UrlMissingError, SanitizeUrlService::InvalidUrlError,
+             ValidateFieldsService::MissingOrInvalidFields => e
+        render json: { message: e.message }, status: 422
+      rescue FetchHtmlService::WebPageError => e
+        render json: { message: e.message }, status: 500
+      rescue StandardError
+        render json: { message: 'There was an unexpected error!' }, status: 500
       end
 
       private
 
       def scrape_params
         params.permit(:url, :commit, fields: {})
-      end
-
-      def handle_url_missing
-        @error = { code: 422, message: 'URL is missing' }
-        render_error
-      end
-
-      def handle_invalid_url_error
-        @error = { code: 422, message: 'URL is invalid' }
-        render_error
-      end
-
-      def handle_missing_or_invalid_fields
-        @error = { code: 422, message: 'Fields are missing or invalid' }
-        render_error
-      end
-
-      def handle_webpage_error(message)
-        @error = { code: 500, message: }
-        render_error
-      end
-
-      def render_error
-        respond_to do |format|
-          format.turbo_stream { render template: 'home_page/scrape' }
-          format.json { render json: @error, status: @error[:code] }
-        end
       end
     end
   end

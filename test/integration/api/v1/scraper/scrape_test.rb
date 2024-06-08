@@ -82,8 +82,7 @@ module Api
         assert_not data['price']
         assert_not data['rating_count']
         assert_not data['rating_value']
-        assert_not data['meta']['keywords']
-        assert_not data['meta']['twitter:image']
+        assert_not data['meta']
       end
 
       test 'with invalid request - missing url' do
@@ -93,12 +92,11 @@ module Api
             price: '.price-box__price'
           }
         }
-        post api_v1_scrape_path, params:, as: :json
-        assert_equal 422, @response.status
 
-        data = @response.parsed_body
-        assert_equal 422, data['code']
-        assert_equal 'URL is missing', data['message']
+        post api_v1_scrape_path, params:, as: :json
+
+        assert_equal 422, @response.status
+        assert_equal 'Missing URL', response.parsed_body['message']
       end
 
       test 'with invalid request - invalid url' do
@@ -112,8 +110,7 @@ module Api
         assert_equal 422, @response.status
 
         data = @response.parsed_body
-        assert_equal 422, data['code']
-        assert_equal 'URL is invalid', data['message']
+        assert_equal 'Invalid URL scheme', data['message']
       end
 
       test 'with invalid request - missing fields' do
@@ -125,14 +122,13 @@ module Api
         assert_equal 422, @response.status
 
         data = @response.parsed_body
-        assert_equal 422, data['code']
         assert_equal 'Fields are missing or invalid', data['message']
       end
 
       test 'with exception raised - Socket::ResolutionError' do
         stub_invalid_webpage
 
-        URI.stubs(:open).raises(
+        Net::HTTP.stubs(:start).raises(
           Socket::ResolutionError.new('Failed to open TCP connection to error_page.com:443' \
                                       '(getaddrinfo: Name or service not known)')
         )
@@ -146,9 +142,12 @@ module Api
 
         post api_v1_scrape_path, params:, as: :json
 
-        data = @response.parsed_body
         assert_equal 500, @response.status
-        assert_equal 'Failed to fetch the page: ', data['message']
+
+        data = @response.parsed_body
+        assert_equal 'Failed to fetch the page: Failed to open TCP connection to ' \
+                     'error_page.com:443(getaddrinfo: Name or service not known)',
+                     data['message']
       end
 
       test 'without meta fields' do
@@ -167,37 +166,6 @@ module Api
         data = @response.parsed_body
         assert_equal '20 890,-', data['price']
         assert_not data['meta']
-      end
-
-      test 'turbo_stream format with valid json request' do
-        stub_valid_webpage
-
-        post api_v1_scrape_path, params: @params.to_json,
-                                 headers: { 'CONTENT_TYPE' => 'application/json',
-                                            'HTTP_ACCEPT' => 'text/vnd.turbo-stream.html' }
-        assert_equal 200, @response.status
-        assert_equal 'text/vnd.turbo-stream.html; charset=utf-8', @response.content_type
-
-        assert_match(/<turbo-stream action="replace" target="response">/, @response.body)
-      end
-
-      test 'turbo_stream format with invalid request' do
-        stub_valid_webpage
-
-        params = {
-          url: 'www.invalid-url',
-          fields: {
-            price: '.price-box__price'
-          }
-        }
-        post api_v1_scrape_path, params: params.to_json,
-                                 headers: { 'CONTENT_TYPE' => 'application/json',
-                                            'HTTP_ACCEPT' => 'text/vnd.turbo-stream.html' }
-        assert_equal 200, @response.status
-        assert_equal 'text/vnd.turbo-stream.html; charset=utf-8', @response.content_type
-
-        assert_match(/<turbo-stream action="replace" target="formErrors">/, @response.body)
-        assert_match(%r{<b>422</b> : URL is invalid}, @response.body)
       end
     end
   end

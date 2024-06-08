@@ -5,6 +5,8 @@ Rails.application.routes.draw do
 
   root 'home_page#index'
 
+  post 'scraper/scrape', to: 'home_page#scrape', as: :scrape
+
   namespace :api do
     namespace :v1 do
       post 'scraper/scrape', to: 'scraper#scrape', as: :scrape
