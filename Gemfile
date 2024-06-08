@@ -37,6 +37,7 @@ gem 'bootsnap', require: false
 gem 'hotwire-rails'
 gem 'nokogiri'
 gem 'cssbundling-rails'
+gem 'http-cookie'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
