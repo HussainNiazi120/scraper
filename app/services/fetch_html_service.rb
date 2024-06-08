@@ -3,11 +3,13 @@
 # Fetch HTML service is responsible for fetching the HTML content of a given URL.
 class FetchHtmlService < ApplicationService
   class WebPageError < StandardError; end
+  class ForbiddenError < StandardError; end
 
+  require 'net/http'
   require 'http-cookie'
 
-  USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)' \
-               'Chrome/58.0.3029.110 Safari/537.3'
+  USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' \
+               '(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0'
 
   def initialize(url)
     super()
@@ -18,9 +20,15 @@ class FetchHtmlService < ApplicationService
   def call
     response = make_request
 
+    raise ForbiddenError if response.code == '403'
+
     response.body
+  rescue ForbiddenError
+    raise ForbiddenError, 'The page is forbidden to access by our server!'
   rescue StandardError => e
     raise WebPageError, "Failed to fetch the page: #{e.message}"
+  ensure
+    @cookie_jar.clear
   end
 
   private

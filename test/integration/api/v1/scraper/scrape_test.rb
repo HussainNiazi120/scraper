@@ -150,6 +150,24 @@ module Api
                      data['message']
       end
 
+      test 'with blocked web page' do
+        stub_blocked_webpage
+
+        params = {
+          url: 'https://blocked-web-page.com',
+          fields: {
+            price: '.price-box__price'
+          }
+        }
+
+        post api_v1_scrape_path, params:, as: :json
+
+        assert_equal 403, @response.status
+
+        data = @response.parsed_body
+        assert_equal 'The page is forbidden to access by our server!', data['message']
+      end
+
       test 'without meta fields' do
         stub_valid_webpage
 
